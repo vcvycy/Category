@@ -19,8 +19,6 @@ def parseLineAllItems(line):
 
 def getListSplitByTab(line):
     pos=[m.start() for m in re.finditer("\t",line)]
-    if len(pos)==0:
-        return [line]
     list=[]
     list.append(line[0:pos[0]])
     for idx in range(0,len(pos)-1):
@@ -42,19 +40,14 @@ def mergeToLine(items):
     return line
 
 # iteration of by f.readline
-def fileLineIter(f,startLine=0,endLine=99990000):
+def fileLineIter(f):
     if type(f)==type(""):
         f=open(f,"rb")
-    curLine=0
     while True:
         line=f.readline().decode("utf-8")
         if line=="":
             break 
-        if curLine>=startLine and curLine<=endLine:
-           yield getListSplitByTab(line)
-        curLine+=1
-        if curLine>endLine:
-            break
+        yield getListSplitByTab(line)
     return
 
 def filesLineIter(files):

@@ -28,7 +28,10 @@ def parseLine(line):
     category=line[pos[0]+1:pos[1]]
     subcategory=line[pos[1]+1:pos[2]]
     title=line[pos[2]+1:pos[3]]
-    content=line[pos[3]+1:]
+    if len(pos)>4:
+        content=line[pos[3]+1:pos[4]]
+    else:
+        content=line[pos[3]+1:]
     #
     url=url.strip()
     category=category.strip()
@@ -128,4 +131,6 @@ def category_dict2vec_vocabular_processor(category_dict,max_article_length,min_f
     return categoryDictIndex,vocabSize,text_vocab_processor
 
 if __name__=="__main__": 
-    ""
+    #list=GetDataList("Dataset/Data-Filtered_by_score_max_5")
+    #print(list[4])
+    print(clean_str("County Sheriff's Office and the"))

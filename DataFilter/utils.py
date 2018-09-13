@@ -17,8 +17,10 @@ def parseLineAllItems(line):
     subcategory=subcategory.strip()
     return url,category,subcategory,title,content
 
-def getListSplitByTab(line):
-    pos=[m.start() for m in re.finditer("\t",line)]
+def getListSplitBy(line,ch="\t"):
+    pos=[m.start() for m in re.finditer(ch,line)]
+    if len(pos)==0:
+        return [line]
     list=[]
     list.append(line[0:pos[0]])
     for idx in range(0,len(pos)-1):
@@ -29,10 +31,26 @@ def getListSplitByTab(line):
         list[i]=list[i].strip() 
     return list
 
+def GetDataList(filename,ch="\t"): 
+    t_start=time.time()
+    list=[]
+    try:
+        f=open(filename,"rb")
+    except: 
+        f=open("Dataset/"+filename,"rb")
+    while True:
+        line=f.readline().decode("utf-8")
+        if line!="":
+            list.append(getListSplitBy(line,ch))
+        else:
+            break
+    print("  [*]Get Data List %s Time: %s" %(filename,int(time.time()-t_start)))
+    return list
+
 def mergeToLine(items):
     line=""
     for idx in range(len(items)):
-        line+=items[idx]
+        line+=str(items[idx])
         if idx!=len(items)-1:
             line+="\t"
         else:
@@ -40,19 +58,36 @@ def mergeToLine(items):
     return line
 
 # iteration of by f.readline
-def fileLineIter(f):
+def fileLineIter(f,startLine=0,endLine=99990000):
     if type(f)==type(""):
-        f=open(f,"rb")
+        try:
+          f=open(f,"rb")
+        except:
+          f=open("Dataset/"+f,"rb")
+    t_start=time.time()
+    cnt=0 
+    curLine=0
     while True:
         line=f.readline().decode("utf-8")
         if line=="":
             break 
-        yield getListSplitByTab(line)
+        if curLine>=startLine and curLine<=endLine:
+           yield getListSplitBy(line)
+        curLine+=1
+        if curLine>endLine:
+            break
+        cnt+=1
+        if cnt%10000==0:
+            print("[*] %d %s" %(cnt,time.time()-t_start))
+            t_start=time.time()
     return
-
-def filesLineIter(files):
+import time
+def filesLineIter(files,showTime=True):
+    if type(files)==type(""):
+        files=[files]
+    t_start=time.time()
+    cnt=0
     for file in files:
-        print("[*]file:%s" %(file))
         try:
             f=open(file,"rb")
         except:
@@ -61,10 +96,15 @@ def filesLineIter(files):
             line=f.readline().decode("utf-8")
             if line=="":
                 break
-            yield getListSplitByTab(line)
+            yield getListSplitBy(line)
+            cnt+=1
+            if cnt%10000==0:
+                print("[*] %d %s" %(cnt,time.time()-t_start))
+                t_start=time.time()
     return
 
 #read data from filename
+"""
 def GetDataList(filename): 
     t_start=time.time()
     list=[]
@@ -80,7 +120,7 @@ def GetDataList(filename):
             break
     print("  [*]Get Data List %s Time: %s" %(filename,int(time.time()-t_start)))
     return list
- 
+ """
 
 def parseLine(line): 
     pos=[m.start() for m in re.finditer("\t",line)]
@@ -121,6 +161,19 @@ def showCategoryDistribution(infile):
             print("  [*]%s :%s" %(subcat,cnt_sub[subcat]))
     return
 
+def url_strip(url): 
+    # remove get parameter
+    for i in range(len(url)):
+        if url[i]=="?":
+            url=url[:i]
+            break 
+    # 
+    idx=len(url)-1
+    while idx>0:
+        if url[idx]=='/':
+            return url[:idx+1]
+        idx-=1
+    return url
 
 if __name__ == "__main__":
     for list in fileLineIter("Dataset/Data-9000"):

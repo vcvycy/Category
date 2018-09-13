@@ -2,8 +2,11 @@ import tensorflow as tf
 import os
 class TextRCNN:
     def __init__(self, sequence_length, num_classes, vocab_size, word_embedding_size, context_embedding_size,
-                 cell_type, hidden_size, l2_reg_lambda,W_text_trainable,out_dir=None):
-        self.sess = tf.Session()
+                 cell_type, hidden_size, l2_reg_lambda,W_text_trainable,out_dir=None,sess=None):
+        if sess==None:
+            self.sess = tf.Session() 
+        else:
+            self.sess = sess 
         # Placeholders for input, output and dropout
         self.input_text = tf.placeholder(tf.int32, shape=[None, sequence_length], name='input_text') 
         self.input_y = tf.placeholder(tf.float32, shape=[None, num_classes], name='input_y')
@@ -28,7 +31,8 @@ class TextRCNN:
                                                                                        cell_bw=bw_cell,
                                                                                        inputs=self.embedded_chars,
                                                                                        sequence_length=text_length,
-                                                                                       dtype=tf.float32)
+                                                                                       dtype=tf.float32
+                                                                                       )
 
         with tf.name_scope("context"):
             shape = [tf.shape(self.output_fw)[0], 1, tf.shape(self.output_fw)[2]]

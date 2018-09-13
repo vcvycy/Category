@@ -1,15 +1,28 @@
 import sys
-CHARACTER_SIZE=127
+CHARACTER_SIZE=127 
+def char2idx(ch): 
+    asc=ord(ch)
+    if asc>=48 and asc<=57:
+        return 48 
+    return ord(ch)
+
+def idx2char(idx): 
+    return chr(idx)
+
 class Node:
     def __init__(self):
         self.next=[None for i in range(CHARACTER_SIZE)]
         self.msg=None 
         return
-
-    def go(self,ch,createIfNotExist=False):
-        if createIfNotExist and self.next[ord(ch)] == None:
-            self.next[ord(ch)]=Node()
-        return self.next[ord(ch)]
+    
+    def go(self,ch,createIfNotExist=False): 
+        idx=char2idx(ch)
+        if createIfNotExist and self.next[idx] == None:
+            self.next[idx]=Node() 
+        if idx>CHARACTER_SIZE:
+            return None
+        else:
+            return self.next[idx] 
      
 class Trie: 
     def __init__(self):
@@ -39,10 +52,15 @@ class Trie:
                 return cur_node.msg
         return None 
              
-    def getScore(self,str,category):
+    def getScore(self,str,category):  
         msg=self.find(str)
         if msg==None or category not in msg[1]:
-            return 0.5
+            return 0.4
         else:  
+            unclassified_cnt=0
+            if "rt_Unclassified" in msg[1]:
+                unclassified_cnt=msg[1]["rt_Unclassified"]
+            if (msg[0]-unclassified_cnt<10):
+                return 0.4
             x=msg[1][category]
-            return x*x/msg[0] 
+            return x/(msg[0]-unclassified_cnt) 

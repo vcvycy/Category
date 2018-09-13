@@ -64,6 +64,7 @@ def solver(mydata,config):
         saver.restore(sess,restore_from)
         print("[*]restore success")
     # Pre-trained word2vec
+    wordInit={}
     if config["LoadGoogleModel"] and restore_from==None: 
         print("[*]Loading Google Pre-trained Model")
         # initial matrix with random uniform
@@ -86,11 +87,17 @@ def solver(mydata,config):
                         break
                     if ch != '\n':
                         word.append(ch)
-                idx = mydata.vocabproc.vocabulary_.get(word)
+                idx = mydata.vocabproc.vocabulary_.get(word.lower())
                 if idx != 0:
-                    initW[idx] = np.fromstring(f.read(binary_len), dtype='float32')
-                    cnt_word_in_word2vec+=1
-                else: 
+                    if idx not in wordInit:
+                      wordInit[idx]= word
+                      initW[idx] = np.fromstring(f.read(binary_len), dtype='float32')
+                      cnt_word_in_word2vec+=1
+                    elif word==word.lower():
+                      wordInit[idx]=word
+                      initW[idx] = np.fromstring(f.read(binary_len), dtype='float32')
+                      
+                else:
                     f.read(binary_len) 
             print("  [*]Load Google Model success: word in Word2Vec :%s total word:%s" 
                   %(cnt_word_in_word2vec,mydata.vocabSize))
@@ -152,6 +159,12 @@ def solver(mydata,config):
             print("Saved model checkpoint to {}\n".format(path))
 
 if __name__ == "__main__": 
+    """while True:
+      if (time.localtime(time.time()).tm_hour==22):
+         print("[*]start runing")
+         break
+      print("[!]wait")
+      time.sleep(60)"""
     config={
         "cell_type":"gru",  # vanilla/lstm/gru
         "sequence_length":400, 
@@ -169,18 +182,19 @@ if __name__ == "__main__":
         "article_droup_out":1.0,  # used to 
         "TraingLogEverySteps":10,
         "TestEverySteps":100, 
+        ##"restore_from":r"runs/2018-08-30-23h-41m-34s/checkpoints/model-19000",
         "restore_from":None,
-        #"restore_from":r"runs\2018-08-15-14h-22m-44s\checkpoints\model-100",
         #dataset
         "trainning_data":"Dataset/Data-9000"
-         }
+        #"trainning_data":"Dataset/AllData_TitleRepeat_add_score_getTop_200000"
+        }
      
     mydata=MYData(config["trainning_data"],
                   minSizePerCategory=10,
                   max_article_length=config["sequence_length"],
                   min_frequence=config["min_frequence"],
-                  training_share= 0.9,
-                  droup_out=config["article_droup_out"]           # will random remove word from article
+                  training_share= 0.95,
+                  droupout=config["article_droup_out"]           # will random remove word from article
                   ) 
     config["BatchSize"]=mydata.getClasses()*6;
     config["vocabSize"]=mydata.vocabSize;

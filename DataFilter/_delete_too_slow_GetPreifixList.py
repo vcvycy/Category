@@ -66,9 +66,10 @@ class Node:
         return
 
     def go(self,ch,createIfNotExist=False): 
-        if createIfNotExist and self.next[char2idx(ch)] == None:
-            self.next[char2idx(ch)]=Node() 
-        return self.next[char2idx(ch)] 
+        idx=char2idx(ch)
+        if createIfNotExist and self.next[idx] == None:
+            self.next[idx]=Node() 
+        return self.next[idx] 
 
     # if exist prefix satisfy our condition,return True,else return False
     def analyse(self,prefix,fout,min_occur,threshold):
@@ -146,8 +147,8 @@ def main(file,outfile,min_freq,threshold,startLine,endLine):
      catSize=0
       
      for list in utils.fileLineIter(file,startLine,endLine):
-         url = url_strip(list[0])
-         category = list[1]
+         url = url_strip(list[0])  #default url=list[0]
+         category = list[1]        #[default] category=list[1]
          if category not in cat2idx:
              cat2idx[category]=catSize
              idx2cat.append(category)
@@ -160,16 +161,15 @@ def main(file,outfile,min_freq,threshold,startLine,endLine):
 
 if __name__ == "__main__": 
      #print(url_strip("http://bigozine2.com/roio/?p=3909"))
-     #sys.exit(0)
-
+     #sys.exit(0) 
      t_start=time.time()
      min_freq=10
-     threshold=0.5
-     startLine=1000000
+     threshold=0.7
+     startLine=0
      endLine=2000000
      #infile="Dataset/FinalData_2017-07-24_2018-07-24_12_12.txt_only_url_catagory"
-     infile="Dataset/FinalData_2016-07-24_2017-07-23_12_12.txt"
-     #infile="Dataset/Data-9000_only_url_catagory" 
+     #infile="Dataset/FinalData_2016-07-24_2017-07-23_12_12.txt"
+     infile="Dataset/Data-9000" 
      outfile=infile+"_url_prefix_distribution_%s_%s_%s_%s" %(min_freq,threshold,startLine,endLine)
      main(infile,outfile,min_freq,threshold,startLine,endLine)
      print("[*]Time Elapsed:%s" %(time.time()-t_start))

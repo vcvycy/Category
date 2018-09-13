@@ -11,7 +11,7 @@ import os
 from Common import CategoryDataUtils,Utils    
 def restore_from_lastest(sess,saver,root):
     path=os.path.join(root,"checkpoints")
-    for i in range(100,1,-1):
+    for i in range(61,1,-1):
         p=os.path.join(path,"model-%d" %(i*1000)) 
         try:
             saver.restore(sess,p)
@@ -83,13 +83,14 @@ class ModelTest():
                         value=False 
                     value=kv[1]
             config[key]=value
-            print("%s = %s type=%s" %(key,value,type(value)))
+            print("%s = %s" %(key,value))
         return config 
      
-    def load_model(self):
+    def load_model(self):   
         config=self.load_config()
         vocabproc = tf.contrib.learn.preprocessing.VocabularyProcessor.restore(os.path.join(self.root,"text.vocab"))
         print("Text Vocabulary Size: {:d}".format(len(vocabproc.vocabulary_)))   
+
         rcnn=TextRCNN(
             sequence_length=config["sequence_length"],
             num_classes=config["classes"],
@@ -106,11 +107,11 @@ class ModelTest():
         restore_from_lastest(self.sess,saver,self.root) 
         return rcnn,vocabproc
 
-    def predict(self,text_list):
+    def _predict(self,text_list):
         if type(text_list)==type(""):
             text_list=[text_list]
-        text_list = CategoryDataUtils.textListPreprocess(text_list) #clean str
-        vec=np.array(list(self.vocabproc.fit_transform(text_list)))
+        text_list = CategoryDataUtils.textListPreprocess(text_list) #clean str 
+        vec=np.array(list(self.vocabproc.transform(text_list))) 
         feed_dict={
             self.rcnn.input_text: vec,
             self.rcnn.dropout_keep_prob:1.0 
@@ -124,13 +125,99 @@ class ModelTest():
             result.append(cur_article)
         return result 
 
+    def predict(self,text_list,preserve_words=400):
+        if type(text_list)==type(""):
+            text_list=[text_list]
+        text_list = CategoryDataUtils.textListPreprocess(text_list) #clean str 
+        vec=np.array(list(self.vocabproc.transform(text_list))) 
+         
+        for i in range(len(vec)):
+            for j in range(preserve_words,400):
+                vec[i][j]=0 
+        result=[]
+        print("[*]transform success");
+        for i in range(0,len(vec),500):
+            feed_dict={
+                self.rcnn.input_text: vec[i:i+500],
+                self.rcnn.dropout_keep_prob:1.0 
+                }
+            predictions,prob = self.sess.run([self.rcnn.predictions,self.rcnn.prob], feed_dict) 
+            for item in prob:
+                cur_article={}
+                for j in range(len(item)):
+                    cur_article[self.idx2cat[j]]=item[j]
+                result.append(cur_article)
+            print("[*]progress:%d/%d" %(i,len(vec)))
+        return result 
+
+    def predict_split(self,text_list):
+        if type(text_list)==type(""):
+            text_list=[text_list]
+        text_list = CategoryDataUtils.textListPreprocess(text_list) #clean str 
+        _vec=list(self.vocabproc.transform(text_list))
+        partNum=1
+        partSize=int(400/partNum)
+        vec=[]
+        for item in _vec: 
+            for i in range(partNum):
+                tmp=item.copy()
+                for j in range(400):
+                    if j>partSize*i and j< partSize*(i+1):
+                        tmp[j]=0 
+                vec.append(tmp)
+        vec=np.array(vec)
+        print(len(vec))
+        result=[]
+        print("[*]transform success");
+        for i in range(0,len(vec),500):
+            feed_dict={
+                self.rcnn.input_text: vec[i:i+500],
+                self.rcnn.dropout_keep_prob:1.0 
+                }
+            predictions,prob = self.sess.run([self.rcnn.predictions,self.rcnn.prob], feed_dict) 
+            for item in prob:
+                cur_article={}
+                for j in range(len(item)):
+                    cur_article[self.idx2cat[j]]=item[j]
+                result.append(cur_article)
+            print("[*]progress:%d/%d" %(i,len(vec)))
+        #merge
+        _result=[]
+        for i in range(0,len(result),partNum):
+            _result.append(merge_result_mean(result[i:i+partNum]))
+            
+        return _result 
+
+def merge_result_mean(r):
+    # 取平均
+    rst={}
+    cats={}
+    for cat in r[0]:
+        rst[cat]=r[0][cat]
+        for i in range(1,len(r)):
+            rst[cat]+=r[i][cat]
+        rst[cat]/=len(r)
+    return rst
+
+
+category_set={
+        "rt_Entertainment",
+        "rt_Politics",
+        "rt_Sports",
+        "rt_US",
+        "rt_Business",
+        "rt_ScienceAndTechnology",
+        "rt_World", 
+        "rt_Health"
+        }
 if __name__ == "__main__":
     #main(r"runs\83_step_25000")
     #dir="runs/83_step_25000"
-    dir="runs/78_keyword-en-us"
+    dir="runs/TitleRepeat_92+"
+    #dir="runs/88.5_prefix_filter"
     model=ModelTest(dir) 
     while True:
         text1=input("\n[*]Input Article")
         result=model.predict([text1])
-        for x in result[0]:
-            print("%s : %.2f%%" %(x,result[0][x]*100)) 
+        print(result) 
+        getFourth(result[0])

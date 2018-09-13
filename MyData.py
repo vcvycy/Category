@@ -8,9 +8,9 @@ class MYData:
     def __init__(self,datafile,
                  minSizePerCategory,
                  max_article_length=400,
-                 min_frequence=5,
+                 min_frequence=20,
                  training_share=0.9,
-                 droup_out=1.0             # not implement now
+                 droupout=1.0             # not implement now
 
                  ): 
         self.text_data={}  # category ->article word list
@@ -20,7 +20,7 @@ class MYData:
                                                                                     max_article_length=400,
                                                                                     min_freq=min_frequence,
                                                                                     ) 
-
+        self.droupout=droupout
         # split self.data into training/testing data
         self.test_data={}  #{"world":["article","artile"...],...}
         self.training_share=training_share;
@@ -107,11 +107,23 @@ class MYData:
             size_per_category-=1
             for cat in self.data: 
                 catIdx=random.randint(0,len(self.data[cat])-1)
-                batch[0].append(self.data[cat][catIdx])
+                batch[0].append(self.wordDroupout(self.data[cat][catIdx]))
                 #batch[1].append(CategoryDataUtils.toOneHot(self.cat2idx[cat],self.getClasses()))
                 batch[1].append(self.oneHot[self.cat2idx[cat]])
                 
         return batch 
+
+    def wordDroupout(self,list):
+        if self.droupout>1-1e-5:
+            return list
+        else:
+            list=list.copy()
+            sz=int(len(list)*self.droupout)
+            while sz>0:
+                idx=random.randint(0,len(list)-1)
+                list[idx]=0
+                sz-=1
+            return list 
 
     def getTestData(self):
         batch=[[],[]]
@@ -125,13 +137,13 @@ class MYData:
 if __name__=="__main__":
     #mydata=MYData("0708-0728-0-3.tsv")
     t_start=time.time()
-    #file="Dataset/Data-9000"
-    file="Dataset/FinalData_2017-07-24_2018-07-24_12_12.txt_maxlength_500_max_per_category_100000_EagleEye-1"
+    file="Dataset/Data-9000"
+    #file="Dataset/FinalData_2017-07-24_2018-07-24_12_12.txt_maxlength_500_max_per_category_100000_EagleEye-1"
     mydata=MYData(file,
                 minSizePerCategory=10,
                 max_article_length=400,
                 min_frequence=10,
                 training_share= 0.9,
-                droup_out=0.7          # will random remove word from article
+                droupout=0.7          # will random remove word from article
                 )  
     print("[*]Elapsed Time: %s" %(time.time()-t_start))
