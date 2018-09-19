@@ -20,7 +20,8 @@ def main(infile,ignore_case):
         title=item[3]
         content=item[4]
         #text.append(title+" "+content)
-        text.append(CategoryDataUtils.clean_str(title+" "+content))
+        cleaned_text=CategoryDataUtils.clean_str(title+" "+content)
+        text.append(cleaned_text)
     
     vocabproc = tf.contrib.learn.preprocessing.VocabularyProcessor(400,min_frequency=20)  
     vocabproc.fit_transform(text) 
@@ -62,8 +63,8 @@ def main(infile,ignore_case):
     return 
 
 if __name__ == "__main__":
-    infile="Dataset/AllData_TitleRepeat_add_score_getTop_200000_CleanText"
-    #infile="Dataset/Data-9000_CleanText"
+    #infile="Dataset/AllData_TitleRepeat_add_score_getTop_200000_CleanText"
+    infile="Dataset/Data-9000"
     fout=open(infile+"_wordvec_join.txt","wb")
     ignore_case=True
     main(infile,ignore_case)

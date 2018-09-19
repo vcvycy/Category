@@ -66,12 +66,12 @@ if __name__ == "__main__":
         "rt_Business",
         "rt_ScienceAndTechnology",
         "rt_World", 
-        "rt_Health",
-        "rt_LifeStyle"
+        "rt_Health"
+        #,"rt_LifeStyle"
         } 
-    max_size_percategory=200000
-    #file_in="NewsFeatures_2018_08_27_17.txt_RandomScore"
-    file_in="Dataset/raw/AllDataRaw_TitleRepeat_add_score"
-    #file_in="AllData_TitleRepeat_add_score"
+    max_size_percategory=250000
+    file_in="Dataset/AllDataPlus_TitleRepeat_add_score"
+    #file_in="Dataset/raw/AllDataRaw_TitleRepeat_add_score"
+    #file_in="Dataset/AllData_TitleRepeat_add_score"
     file_out=file_in+"_getTop_%s" %(max_size_percategory)
     main(file_in,file_out,max_size_percategory,category_set)

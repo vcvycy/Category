@@ -5,7 +5,7 @@ from Common import CategoryDataUtils
 import sys
 
 if __name__=="__main__":
-    """
+    #"""
     urls={}
     for item in utils.fileLineIter("NewsFeatures_2018_08_27_17_Random30_Correct"):
         urls[item[0]]=item[1]
@@ -19,3 +19,4 @@ if __name__=="__main__":
     """
     for item in utils.fileLineIter("tmp.txt"):
         print(item[3]+" "+item[4])
+    """

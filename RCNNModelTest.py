@@ -11,7 +11,7 @@ import os
 from Common import CategoryDataUtils,Utils    
 def restore_from_lastest(sess,saver,root):
     path=os.path.join(root,"checkpoints")
-    for i in range(61,1,-1):
+    for i in range(60,1,-1):
         p=os.path.join(path,"model-%d" %(i*1000)) 
         try:
             saver.restore(sess,p)
@@ -127,8 +127,8 @@ class ModelTest():
 
     def predict(self,text_list,preserve_words=400):
         if type(text_list)==type(""):
-            text_list=[text_list]
-        text_list = CategoryDataUtils.textListPreprocess(text_list) #clean str 
+            text_list=[text_list] 
+        text_list = [CategoryDataUtils.clean_str(sent) for sent in text_list]
         vec=np.array(list(self.vocabproc.transform(text_list))) 
          
         for i in range(len(vec)):

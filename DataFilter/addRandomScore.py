@@ -1,3 +1,4 @@
+# used to randomly select some news
 import utils
 import random
 def main(infile,outfile):

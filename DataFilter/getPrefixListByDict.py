@@ -165,9 +165,9 @@ if __name__ == "__main__":
      # Get Prefix List
      t_start=time.time()
      min_freq=10
-     threshold=0.7 
+     threshold=0.5
      #infile="Dataset/FinalData_2016-07-24_2017-07-23_12_12.txt"
-     infile="Dataset/raw/AllDataRaw_TitleRepeat" 
+     infile="Dataset/AllDataPlus_TitleRepeat" 
      outfile=infile+"_PrefixListByDict_%s_%s" %(min_freq,threshold) 
      main(infile,outfile,min_freq,threshold)
      print("[*]Time Elapsed:%s" %(time.time()-t_start))

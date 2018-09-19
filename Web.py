@@ -29,7 +29,8 @@ if __name__=="__main__":
     #model_dir="runs/92.2"
     #model_dir="runs/TitleRepeat_92+"
     #model_dir="runs/RemoveDigit"
-    model_dir="runs/WithoutQueryJoin"
+    model_dir="runs/NewCleanText"
+    
     model=RCNNModelTest.ModelTest(model_dir)
     print(model_dir)
     run(host="t-jianc-work",port=8081)

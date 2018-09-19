@@ -18,6 +18,9 @@ def showCategoryDistribution(infile):
             if subcat not in cnt[category][1]:
                 cnt[category][1][subcat]=0
             cnt[category][1][subcat]+=1 
+            if category=="rt_Business":
+                print(list)
+                input("")
     print("\n[*]files:%s" %(infile))
     #show
     for cat in cnt:
@@ -36,5 +39,5 @@ if __name__ == "__main__":
     #file="news_del_Data-Filtered_files_3_desc_by_length"
     #file="NewsFeatures_2018_08_27_17_Random30_Origin"
     #file ="NewsFeatures_2018_08_27_17.txt"
-    file="raw/WithoutQueryJoin_en_2017-08-29_2018-08-28_17_17.txt_TitleRepeat"
+    file="raw/AllDataRaw_TitleRepeat"
     showCategoryDistribution(file)

@@ -39,6 +39,8 @@ def main(infile,outfile,title_idx=3):
     return
 if __name__== "__main__":
     # read news from file. remove news that has same title
-    files="Dataset/raw/AllDataRaw"   
-    out_file=files+"_TitleRepeat"
+    files=["AllDataPlus_TitleRepeat_add_score_getTop_250000",
+           "raw/AllDataRaw_TitleRepeat_add_score_getTop_80000"
+           ]
+    out_file="Dataset/AllDataPlus_merge_raw80000"
     main(files,out_file)

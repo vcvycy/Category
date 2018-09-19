@@ -2,6 +2,7 @@ import RCNNModelTest
 import json 
 from DataFilter import utils
 import sys
+from Common import CategoryDataUtils
 
 category_set={
         "rt_Entertainment",
@@ -16,7 +17,7 @@ category_set={
 
 def getFinalCategory(probs): 
     c,p="",0.0
-    prob_sum=0.0
+    prob_sum=0.0 
     for cat in category_set:
         if probs[cat] > p:
             c,p=cat,probs[cat] 
@@ -35,14 +36,11 @@ def getKthProb(probs,k):
     #print("%s -> %s" %(probs,items[3]))
     return items[k-1]
 
-if __name__=="__main__":  
-    #model_dir="RemoveDigit"
-    #model_dir="TitleRepeat_92+"
-    model_dir="WithoutQueryJoin"
-    #model_dir="89.8_droup_word_0.7"
-    #model_dir="92.2"
-    #model_dir="Final-60000"
-    #model_dir="500_0.001"
+if __name__=="__main__":   
+    #model_dir="NewCleanText"
+    #model_dir="TitleRepeat_92+" 
+    model_dir ="95+_330000"
+    #model_dir = "93.7"
     #filetest="NewsFeatures_2018_08_27_17_Random30_Origin" 
     filetest="NewsFeatures_2018_08_27_17_Random30_Correct" 
     #filetest="NewsFeatures_2018_08_27_17.txt"
@@ -79,7 +77,7 @@ if __name__=="__main__":
         record["sum"]+=1 
         rc=record[category]
         rc["sum"]+=1
-        print("%s %s %s" %(category,c,url))
+        print("%s %s %s %s" %(category,c,url,p))
         if category!=c:
             record["diff"]+=1
             rc["diff"]+=1

@@ -95,6 +95,9 @@ def clean_str(string):
     string = re.sub(r"\)", " \) ", string)
     string = re.sub(r"\?", " \? ", string)
     string = re.sub(r"\s{2,}", " ", string)
+    #
+    string = re.sub("\'","",string)
+    string = re.sub(" [^A-Za-z,!?;.()]+ "," "," "+string+" ") 
     return string.strip().lower()
 
 def textListPreprocess(all_text):
@@ -131,6 +134,7 @@ def category_dict2vec_vocabular_processor(category_dict,max_article_length,min_f
     return categoryDictIndex,vocabSize,text_vocab_processor
 
 if __name__=="__main__": 
+
     #list=GetDataList("Dataset/Data-Filtered_by_score_max_5")
     #print(list[4])
-    print(clean_str("County Sheriff's Office and the"))
+    print(clean_str("2019-08-07"))
